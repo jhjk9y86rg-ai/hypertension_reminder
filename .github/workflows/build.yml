@@ -1,0 +1,32 @@
+name: 打包 Windows 可执行文件
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+      - name: 设置 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          architecture: 'x64'
+      - name: 安装依赖
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pyinstaller
+      - name: 打包成 exe
+        run: |
+          python build_executable.py
+      - name: 上传打包文件
+        uses: actions/upload-artifact@v4
+        with:
+          name: hypertension_reminder_windows
+          path: dist/*.exe
